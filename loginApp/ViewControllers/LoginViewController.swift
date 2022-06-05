@@ -13,24 +13,23 @@ class LoginViewController: UIViewController {
     @IBOutlet var passwordTF: UITextField!
     @IBOutlet var buttonLogIn: UIButton!
 
-    private let goodUser = "User"
-    private let goodPassword = "Password"
-    
+    private let user = User.getUser()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         buttonLogIn.layer.cornerRadius = 10
     }
     
     @IBAction func forgotUserNamePressed() {
-        showAlert("Oops", "User name: \(goodUser)")
+        showAlert("Oops", "User name: \(user.user)")
     }
     
     @IBAction func forgotPasswordPressed() {
-        showAlert("Oops", "Password: \(goodPassword)")
+        showAlert("Oops", "Password: \(user.password)")
     }
     
     @IBAction func buttonLogInPressed() {
-        if userTF.text != goodUser || passwordTF.text != goodPassword {
+        if userTF.text != user.user || passwordTF.text != user.password {
             passwordTF.text = ""
             showAlert("Error", "Invalid User name or Password!")
         }
@@ -42,8 +41,19 @@ class LoginViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let welcomeVC = segue.destination as? WelcomeViewController else { return }
-        welcomeVC.user = userTF.text
+        guard let tabBarController = segue.destination as? UITabBarController else { return }
+        guard let viewControllers = tabBarController.viewControllers else { return }
+        
+        for VC in viewControllers {
+            if let welcomeVC = VC as? WelcomeViewController {
+                welcomeVC.user = user
+            } else if let navigationVC = VC as? UINavigationController {
+                let aboutVC = navigationVC.topViewController as! AboutViewController
+                aboutVC.user = user
+            }
+            
+        }
+            
     }
     
 }
